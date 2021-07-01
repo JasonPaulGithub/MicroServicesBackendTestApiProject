@@ -4,4 +4,4 @@ You can find instructions in the code comment, but in short simply run this Curl
 
 > curl -X POST -H "Content-type: application/json" -d "10" "http://localhost:8080/postbody"
 
-You can replace the "10" with the interval you wish to try.
+You can replace the "10" with the interval you wish to use.
