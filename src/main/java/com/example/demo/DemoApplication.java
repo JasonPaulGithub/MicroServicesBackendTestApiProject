@@ -43,6 +43,7 @@ public class DemoApplication implements CommandLineRunner {
 
         // Convert the resulting String Builder to Json Object
         JSONObject paymentRecord = new JSONObject(content.toString());
+        // For sake of brevity let's assume 660 is a permanent code value for a variety of nested values
         JSONObject ssz = paymentRecord.getJSONObject("660");
 
         // Extract the Keys
@@ -57,7 +58,7 @@ public class DemoApplication implements CommandLineRunner {
 
         // Get the average value for each interval
         int interval = 60;
-        JSONArray targetArray = nestedArrays.get("3000");
+        JSONArray targetArray = nestedArrays.get("3000"); //todo: loop
         double totalSumOfValues = 0;
         int enteries = 0;
         for (int x = interval; x <= targetArray.length(); x = x + interval) {
