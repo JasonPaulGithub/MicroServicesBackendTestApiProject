@@ -2,28 +2,42 @@ package com.example.demo;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 @SpringBootApplication
-public class DemoApplication implements CommandLineRunner {
+public class DemoApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(DemoApplication.class, args);
     }
 
-    @Override
-    public void run(String... args) throws Exception {
+    @RestController
+    public class restController {
+        /**
+         * Post Request
+         * How to use: Swap the interval (i.e: "10") in the CURL below to the required value:
+
+         curl -X POST -H "Content-type: application/json" -d "10" "http://localhost:8080/postbody"
+
+         **/
+        @PostMapping("/postbody")
+        public String postBody(@RequestBody int period) throws IOException {
+            return "For a Period of " + period + ": The (Average) Result is " + getInterval(period);
+        }
+    }
+
+    public String getInterval(int interval) throws IOException {
 
         // Connect to get the data from URL
         URL url = new URL("https://reference.intellisense.io/test.dataprovider");
@@ -49,53 +63,39 @@ public class DemoApplication implements CommandLineRunner {
 
         // Extract the Keys
         Iterator<String> keys = ssz.keys();
-        Map<String, JSONArray> nestedArrays = new HashMap<>();
+        Map<String, JSONArray> nestedKeys = new HashMap<>();
+        List<String> nestedReference = new ArrayList<>();
+
         while (keys.hasNext()) {
             String key = keys.next();
             if (ssz.get(key) instanceof JSONArray) {
-                nestedArrays.put(key, ssz.getJSONArray(key));
+                nestedKeys.put(key, ssz.getJSONArray(key));
+                nestedReference.add(key);
             }
         }
 
         // Get the average value for each interval
-        int interval = 60;
-        JSONArray targetArray = nestedArrays.get("3000"); //todo: loop
         double totalSumOfValues = 0;
-        int enteries = 0;
-        for (int x = interval; x <= targetArray.length(); x = x + interval) {
-            try {
-                System.out.println("Entry = " + targetArray.get(x));
-                String s = String.valueOf(targetArray.get(x));
-                double d = Double.parseDouble(s);
-                totalSumOfValues = totalSumOfValues + d;
-                enteries++;
-            } catch (Exception s) {
-                System.out.println(s);
+        int entries = 0;
+
+        for (String reference : nestedReference) {
+            JSONArray targetArray = nestedKeys.get(reference);
+            for (int x = 0; x < nestedKeys.size(); x++) {
+                for (int y = interval; y <= targetArray.length(); y = y + interval) {
+                    try {
+                        //System.out.println("Entry = " + targetArray.get(y));
+                        String s = String.valueOf(targetArray.get(y));
+                        double d = Double.parseDouble(s);
+                        totalSumOfValues = totalSumOfValues + d;
+                        entries++;
+                    } catch (Exception s) {
+                        //System.out.println(s);
+                    }
+                }
             }
         }
-        System.out.println(totalSumOfValues);
-        System.out.println("Average = " + totalSumOfValues / enteries);
-    }
 
-
-    @RestController
-    public class restController {
-        @GetMapping("/hello")
-        public String getHello() {
-            return "Hello";
-        }
-
-        /**
-         * Post Request
-         *
-         * How to use: Swap the interval with the "10" to what ever is required.
-         *
-          curl -X POST -H "Content-type: application/json" -d "10" "http://localhost:8080/postbody"
-         **/
-        @PostMapping("/postbody")
-        public String postBody(@RequestBody String period) {
-            return "For a Period of " + period + ": The (Average) Result is " + period;
-        }
+        return String.valueOf(totalSumOfValues / entries);
     }
 
 }
