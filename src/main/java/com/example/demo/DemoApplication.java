@@ -5,15 +5,14 @@ import org.json.JSONObject;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 @SpringBootApplication
 public class DemoApplication implements CommandLineRunner {
@@ -59,33 +58,20 @@ public class DemoApplication implements CommandLineRunner {
         // Get the average value for each interval
         int interval = 60;
         JSONArray targetArray = nestedArrays.get("3000");
-        for (int i = interval; i <= targetArray.length(); i = i + interval) {
-            System.out.println(targetArray.get(i));
-            // return an average value
-        }
-
-    }
-
-    /**
-     * Get Request
-     **/
-    @RestController
-    public class restController {
-
-        @GetMapping("/hello")
-        public String getHello() {
-            return "Hello";
-        }
-
-        /**
-         * Post Request
-         **/
-        @RestController
-        public class postHello {
-            @PostMapping("/hello")
-            public String postHello() {
-                return "Hello";
+        double totalSumOfValues = 0;
+        int enteries = 0;
+        for (int x = interval; x <= targetArray.length(); x = x + interval) {
+            try {
+                System.out.println("Entry = " + targetArray.get(x));
+                String s = String.valueOf(targetArray.get(x));
+                double d = Double.parseDouble(s);
+                totalSumOfValues = totalSumOfValues + d;
+                enteries++;
+            } catch (Exception s) {
+                System.out.println(s);
             }
         }
+        System.out.println(totalSumOfValues);
+        System.out.println("Average = " + totalSumOfValues/enteries );
     }
 }
