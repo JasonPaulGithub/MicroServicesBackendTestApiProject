@@ -40,7 +40,7 @@ public class DemoApplication {
     public String getInterval(int interval) throws IOException {
 
         // Connect to get the data from URL
-        URL url = new URL("https://reference.intellisense.io/test.dataprovider");
+        URL url = new URL("<URL GOES HERE>");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
         // int status = con.getResponseCode();
